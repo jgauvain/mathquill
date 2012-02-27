@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="mathquill.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="mathquill.php"></script>
+<script src="AMtoMQlite.js?v=2"></script>
+</head>
+<body>
+<input type="button" onclick="loadcase(0)" value="testcase 1"/>
+<input type="button" onclick="loadcase(1)" value="testcase 2"/>
+<input type="button" onclick="loadcase(2)" value="testcase 3"/>
+<input type="button" onclick="loadcase(3)" value="testcase 4"/>
+<input type="button" onclick="loadcase(4)" value="testcase 5"/>
+<input type="button" onclick="loadcase(5)" value="testcase 6"/>
+<input type="button" onclick="loadcase(6)" value="testcase 7"/>
+<input type="button" onclick="loadcase(7)" value="testcase 8"/>
+<input type="button" onclick="loadcase(8)" value="testcase 9"/>
+<input type="button" onclick="loadcase(9)" value="testcase 10"/>
+<br/>
+
+
+<p>Test name/notes: <span id="testnotes">Default load</span></p>
+Initial MathQuill:  <span id="editable-math" class="mathquill-editable">e^{3x+4}-5</span><br/>
+MathQuill's latex output: <textarea id="latex-source" style="width:60%;vertical-align:top"></textarea><br/>
+Converted to AsciiMath: <textarea id="am-source" style="width:60%;vertical-align:top"></textarea><br/>
+<span id="doesitmatch"></span><br/>
+Converted back to TeX: <textarea id="amt-source" style="width:60%;vertical-align:top"></textarea><br/>
+Re-rendered using MathQuill: <span id="output-math" class="mathquill-editable">4\left|x+1\right|</span>
+<script type="text/javascript">
+
+var testcases = [ //each is TeX, Asciimath
+	['3^{-1}+2^4+\\left(2+3\\right)^2-3^{2+3}', '3^-1+2^4+(2+3)^2-3^(2+3)', 'Forms of Exponents'],   //forms of exponents
+	['\\sqrt{2+3}+\\nthroot{3}{5}+\\frac{3}{4}-\\frac{2}{3+4}+\\frac{-1}{-5}', 'sqrt(2+3)+root(3)(5)+3/4-(2)/(3+4)+(-1)/(-5)', 'Roots and fractions'], //roots and fractions
+	['4+\\left|2 + 3\\right|+1','4+abs(2+3)+1', 'Absolute values.  Mathquill can\'t do nested abs'], //absolute values
+	['3+\\left(2+\\left(3+4\\right)\\right)+3', '3+(2+(3+4))+3', 'Nested parens'], //nested parens
+	['\\sin^{-1}\\left(\\theta\\right)+\\cos\\left(\\frac{\\pi}{2}x+3\\right)-\\tan^2\\left(x\\right)', 'sin^-1(theta)+cos((pi)/(2)x+3)-tan^2(x)','Trig arctrig and pi'], //pi, trig, arctrig
+	['\\log\\left(x+3\\right)+\\infty+\\log_2\\right(x\\right)+\\varnothing', 'log(x+3)+oo+log_2(x)+DNE', 'Logs and special chars.  DNE is still ok as entry, but this allows \\varnothing as alternative'],  //logs and special chars
+	['27\\frac{2}{3}', '27 2/3', 'Mixed number'],  //mixed number
+	['2=4+2<9\\le10\\text{ or }3>5\\text{all real numbers}', '2=4+2<9<=10 or 3>5all real numbers', 'Equations and inequalities. '],  //equations and inequalities
+	['\\left(2,3\\right)+\\langle{\\frac{2}{3},4}', '(2,3)+<<2/3,4>>', 'Points and vectors.  To distinguish angle brackets from inequalities, I\'ll need to adjust the grader to accept &lt;&lt;2,3&gt;&gt; for vector input. MathQuill has a weird format for langle.  '], //points and vectors
+	['\\intervalopenleft{1,2}\\cup\\intervalopenright{2,3}\\cup(3,4)\\cup[4,5]', '(1,2]U[2,3)U(3,4)U[4,5]', 'Intervals. IMathAS uses U as input for union, but that is not really AsciiMath, so this is a bit hacked up.']
+];
+var latexMath = $('#editable-math'), latexSource = $('#latex-source'), amSource = $('#am-source'), AMTSource = $('#amt-source'), outMath = $('#output-math');
+
+$(function() {
+  latexMath.bind('keydown keypress', function() {
+    setTimeout(function() {
+      var latex = latexMath.mathquill('latex');
+      latexSource.val(latex);
+      var AMout = TeXtoAsciiMath(latex);
+      amSource.val(AMout);
+      var AMTout = AsciiMathtoTex(AMout);
+      AMTSource.val(AMTout);
+      outMath.mathquill('latex', AMTout);
+    });
+  }).keydown().focus();
+});
+
+$(function() {
+  amSource.bind('keydown keypress', function() {
+    setTimeout(function() {
+      var AMout = amSource.val();
+      var AMTout = AsciiMathtoTex(AMout);
+      AMTSource.val(AMTout);
+      outMath.mathquill('latex', AMTout);
+    });
+  }).keydown().focus();
+});
+$(function() {
+  AMTSource.bind('keydown keypress', function() {
+    setTimeout(function() {
+      var AMTout = AMTSource.val();
+      outMath.mathquill('latex', AMTout);
+    });
+  }).keydown().focus();
+});
+
+function loadcase(n) {
+	$('#testnotes').html(testcases[n][2]);
+	latexMath.mathquill('latex', testcases[n][0]);
+	
+	      var latex = latexMath.mathquill('latex');
+	      latexSource.val(latex);
+	      var AMout = TeXtoAsciiMath(latex);
+	      if (AMout != testcases[n][1]) {
+	      	     $("#doesitmatch").html('<span style="color:red">Does not match expected AsciiMath output. Expected'+testcases[n][1]+'</span>');
+	      } else {
+	      	     $("#doesitmatch").html('<span style="color:green">Matches expected AsciiMath output</span>'); 
+	      }
+	      amSource.val(AMout);
+	      var AMTout = AsciiMathtoTex(AMout)
+	      AMTSource.val(AMTout);
+	      outMath.mathquill('latex', AMTout);
+	 
+}
+function AsciiMathtoTex(am) {
+	//use existing engine for initial pass
+	am = AMTparseAMtoTeX(am);
+	return am;
+}
+/*
+\left| expr \right| to  abs(expr)
+\left( expression \right)  to   (expression)
+\sqrt{expression}  to sqrt(expression)
+\nthroot{n}{expr}  to  root(n)(expr)
+\frac{num}{denom} to (num)/(denom)
+\langle whatever \rangle   to   < whatever >                 **not done yet
+\begin{matrix} a&b\\c&d  \end{matrix}    to  [(a,b),(c,d)]   **not done yet
+
+n\frac{num}{denom} to n num/denom
+*/
+function TeXtoAsciiMath(tex) {
+	tex = tex.replace(/\\:/g,' ');
+	while ((i=tex.indexOf('\\left|'))!=-1) { //found a left |
+		nested = 0;
+		do {
+			lb = tex.indexOf('\\left|',i+1);
+			rb = tex.indexOf('\\right|',i+1);
+			if (lb !=-1 && lb < rb) {	//if another left |
+				nested++;  
+			} else if (rb!=-1 && (lb == -1 || rb < lb)) {  //if right |
+				nested--;
+			}
+		} while (nested>0 && rb!=-1);  //until nested back to 0 or no right |
+		if (rb!=-1) {  //have a right |  - replace with abs( )
+			tex = tex.substring(0,rb) + ")" + tex.substring(rb+7);
+			tex = tex.substring(0,i) + "abs(" + tex.substring(i+6);
+		} else {
+			tex = tex.substring(0,i) + "|" + tex.substring(i+6);
+		}
+	}
+	tex = tex.replace(/\\text{\s*or\s*}/g,' or ');
+	tex = tex.replace(/\\text{all\s+real\s+numbers}/g,'all real numbers');
+	tex = tex.replace(/\\le(?!f)/g,'<=');
+	tex = tex.replace(/\\ge/g,'>=');
+	tex = tex.replace(/\\cup/g,'U');
+	tex = tex.replace(/\\left/g,'');
+	tex = tex.replace(/\\right/g,'');
+	tex = tex.replace(/\\langle/g,'<<');
+	tex = tex.replace(/\\rangle/g,'>>');
+	tex = tex.replace(/\\cdot/g,'*');
+	tex = tex.replace(/\\infty/g,'oo');
+	tex = tex.replace(/\\nthroot/g,'root');
+	tex = tex.replace(/\\varnothing/g,'DNE');
+	tex = tex.replace(/\\/g,'');
+	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
+	tex = tex.replace(/(\d)frac/g,'$1 frac');
+	while ((i=tex.indexOf('frac{'))!=-1) { //found a fraction start
+		nested = 1;
+		curpos = i+5;
+		while (nested>0 && curpos<tex.length-1) {
+			curpos++;
+			c = tex.charAt(curpos);
+			if (c=='{') { nested++;}
+			else if (c=='}') {nested--;}
+		}
+		if (nested==0) {
+			tex = tex.substring(0,i)+"("+tex.substring(i+5,curpos)+")/"+tex.substring(curpos+1);
+		} else {
+			tex = tex.substring(0,i) + tex.substring(i+4);
+		}
+	}
+	tex = tex.replace(/{/g,'(');
+	tex = tex.replace(/}/g,')');
+	tex = tex.replace(/\(([\d\.]+)\)\/\(([\d\.]+)\)/g,'$1/$2');  //change (2)/(3) to 2/3
+	tex = tex.replace(/_{(\d+)}/g,'_$1');
+	tex = tex.replace(/\^\(-1\)/g,'^-1');
+	
+	return tex;
+}
+</script>
+</body>
+</html>
