@@ -255,7 +255,9 @@ _.html_template = [
 ];
 _.text_template = ['sqrt[', '](', ')'];
 _.latex = function() {
-  return '\\sqrt['+this.firstChild.latex()+']{'+this.lastChild.latex()+'}';
+  //return '\\sqrt['+this.firstChild.latex()+']{'+this.lastChild.latex()+'}';
+  //This fixes cut-and-paste
+  return '\\nthroot{'+this.firstChild.latex()+'}{'+this.lastChild.latex()+'}';
 };
 
 LatexCmds.nthroot = NthRoot;
@@ -287,6 +289,13 @@ _.redraw = function() {
   var height = this.blockjQ.outerHeight()/+this.blockjQ.css('fontSize').slice(0,-2);
   scale(this.bracketjQs, min(1 + .2*(height - 1), 1.2), 1.05*height);
 };
+
+LatexCmds.intervalopenleft = proto(Bracket, function(replacedFragment) {
+	Bracket.call(this, '(', ']', '(', ']', replacedFragment);
+});
+LatexCmds.intervalopenright = proto(Bracket, function(replacedFragment) {
+	Bracket.call(this, '[', ')', '[', ')', replacedFragment);
+});
 
 LatexCmds.lbrace = CharCmds['{'] = proto(Bracket, function(replacedFragment) {
   Bracket.call(this, '{', '}', '\\{', '\\}', replacedFragment);

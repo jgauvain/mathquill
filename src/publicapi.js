@@ -47,6 +47,38 @@ $.fn.mathquill = function(cmd, latex) {
         if (cursor)
           cursor.writeLatex(latex).parent.blur();
       });
+  case 'writefunc':
+      if (arguments.length > 1)
+      return this.each(function() {
+        var data = $(this).data(jQueryDataKey),
+          block = data && data.block,
+          cursor = block && block.cursor;
+
+          if (cursor) {
+          	  if (cursor.selection) {
+          	  	  cursor.writeLatex(latex+'\\left('+cursor.selection.latex()+'\\right)').parent.blur();
+          	  } else {
+          	  	  cursor.writeLatex(latex+'\\left(\\right)').parent.blur();
+          	  }
+          	  cursor.moveLeft();
+          }
+      });
+   case 'writesimpfunc':
+      if (arguments.length > 1)
+      return this.each(function() {
+        var data = $(this).data(jQueryDataKey),
+          block = data && data.block,
+          cursor = block && block.cursor;
+
+          if (cursor) {
+          	  if (cursor.selection) {
+          	  	  cursor.writeLatex(latex+'{'+cursor.selection.latex()+'}').parent.blur();
+          	  } else {
+          	  	  cursor.writeLatex(latex).parent.blur();
+          	  }
+          	  cursor.moveLeft();
+          }
+      });
   case 'cmd':
     if (arguments.length > 1)
       return this.each(function() {
@@ -70,7 +102,41 @@ $.fn.mathquill = function(cmd, latex) {
           cursor.hide().parent.blur();
         }
       });
-  default:
+  case 'writeint':
+    if (arguments.length > 1)
+      return this.each(function() {
+        var data = $(this).data(jQueryDataKey),
+          block = data && data.block,
+          cursor = block && block.cursor;
+
+        if (cursor) {
+          var hascomma = false;
+          if (cursor.selection && cursor.selection.latex().match(/,/)) {
+            	    hascomma = true;    
+          }
+          cursor.show();
+          if (/^\\[a-z]+$/i.test(latex)) {
+            if (cursor.selection) {
+              //gotta do cursor before cursor.selection is mutated by 'new cmd(cursor.selection)'
+              cursor.prev = cursor.selection.prev;
+              cursor.next = cursor.selection.next;
+            }
+            
+            
+            cursor.insertCmd(latex.slice(1), cursor.selection);
+            delete cursor.selection;
+          }
+          else {
+            cursor.insertCh(latex);
+          }
+          if (!hascomma) {
+            	    cursor.insertCh(',');
+            	    cursor.moveLeft();
+            }
+          cursor.hide().parent.blur();
+        }
+      });
+      default:
     var textbox = cmd === 'textbox',
       editable = textbox || cmd === 'editable',
       RootBlock = textbox ? RootTextBlock : RootMathBlock;

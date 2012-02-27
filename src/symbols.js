@@ -18,7 +18,32 @@ _.text = function() {
     text += '*';
   return text;
 };
-
+_.insertAt = function(c) {
+	  var lookback = this.cmd;
+	  d = c.prev;
+	  while (d && d instanceof Variable) {
+		  lookback = d.cmd + lookback;
+		  d = d.prev;
+	  }
+	  if (lookback.match(/(sqrt|root|sin|cos|tan|sec|csc|cot|log|ln)/)) {
+	  	  for (var i=0;i<lookback.length-1;i++) {
+	  	  	  c.selectLeft();
+	  	  }
+	  	  if (lookback=='root') {
+	  	  	  lookback = 'nthroot{3}';
+	  	  }
+	  	  c.writeLatex('\\'+lookback);
+	  	  if (lookback.match(/(sqrt|root)/)) {
+	  	  	  c.moveLeft();
+	  	  }
+	  } else if (lookback.match(/^(pi|oo)$/)) {
+		  if (lookback=='oo') { lookback = 'infty';}
+		  c.selectLeft();
+		  c.writeLatex('\\'+lookback);
+	  } else {
+	  	  MathCommand.prototype.insertAt.apply(this,arguments);
+	  }
+}
 function VanillaSymbol(ch, html) {
   Symbol.call(this, ch, '<span>'+(html || ch)+'</span>');
 }
@@ -139,7 +164,17 @@ LatexCmds.forall = proto(Symbol, function(replacedFragment, latex) {
 function BinaryOperator(cmd, html, text) {
   Symbol.call(this, cmd, '<span class="binary-operator">'+html+'</span>', text);
 }
-BinaryOperator.prototype = new Symbol; //so instanceof will work
+_ = BinaryOperator.prototype = new Symbol; //so instanceof will work
+_.insertAt = function(af) {
+	var ae = af.prev.cmd + this.cmd;
+	if(ae==="<="){
+		af.backspace().insertNew(new BinaryOperator("\\le ","&le;"));
+	} else if(ae===">="){
+		af.backspace().insertNew(new BinaryOperator("\\ge ","&ge;"));
+	} else {
+		MathCommand.prototype.insertAt.apply(this,arguments);
+	}
+}
 
 function PlusMinus(cmd, html) {
   VanillaSymbol.apply(this, arguments);
