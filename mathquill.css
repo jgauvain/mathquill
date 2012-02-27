@@ -270,6 +270,7 @@
   margin-right: -.6em;
   margin-left: .2em;
   min-width: .5em;
+  z-index: 2;
 }
 .mathquill-rendered-math sup.limit, .mathquill-rendered-math sub.limit,
 .mathquill-rendered-math sup.nthroot {
