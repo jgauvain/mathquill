@@ -29,6 +29,15 @@
 	vertical-align: middle;
 	color: #000;
 }
+.eeactive {
+	background: #cfc;
+}
+.eehighlight {
+	background: #ccf;
+}
+.eeclick {
+	background: #99f;
+}
 </style>
 
 </head>
@@ -36,13 +45,26 @@
 
 <h1>MathQuill Toolbar Demo</h1>
 
-<p>This is a demo of a discoverable toolbar GUI for MathQuill commands and symbols.
+<p>This is a demo of a discoverable toolbar GUI for MathQuill commands and symbols. </p>
 
-<p>Editable Math: <span id="mqentry" class="mathquill-editable"></span>
+<p>Input box 1: <span class="mathquill-editable" id="mq01" ></span> <input type="text" class="use-mathquill" id="qn01" />  </p>
+
+<p>Some text</p>
+
+<p>Input box 2: <span class="mathquill-editable" id="mq02" >x^2</span> <input type="text" class="use-mathquill" id="qn02" value="x^2" />  </p>
 
 
-<div id="ee" style="position: absolute; width: auto; background: #ff0;padding: 5px; ">
+<div id="ee" style="position: absolute; width: auto; background: #ff0;padding: 5px;">
 <div id="eeadvanced">
+<table>
+<tr>
+<td class="eetab eeactive" id="eetab1" onclick="eetoggleactive('1')">General</td>
+<td class="eetab" id="eetab4" onclick="eetoggleactive('4')">Intervals</td>
+<td class="eetab" id="eetab5" onclick="eetoggleactive('5')">Inequalities</td>
+<td class="eetab" id="eetab2" onclick="eetoggleactive('2')">Functions</td>
+<td class="eetab" id="eetab3" onclick="eetoggleactive('3')">Trig</td>
+</tr>
+</table>
 <table id="ee1">
 <tr>
 <td class="eebtn" btntext="\\frac" btntype="0"><sup>x</sup>/<sub>y</sub></td>
@@ -98,104 +120,125 @@
 <td class="eebtn" btntext="\\langle" btntype="0">&lt;  &gt;</td>
 </tr>
 </table>
-<table>
-<tr>
-<td class="eetab" id="eetab1" style="background: #cfc" onclick="eetoggleactive('1')">General</td>
-<td class="eetab" id="eetab4" onclick="eetoggleactive('4')">Intervals</td>
-<td class="eetab" id="eetab5" onclick="eetoggleactive('5')">Inequalities</td>
-<td class="eetab" id="eetab2" onclick="eetoggleactive('2')">Functions</td>
-<td class="eetab" id="eetab3" onclick="eetoggleactive('3')">Trig</td>
-</tr>
-</table>
 </div>
 </div>
 
 <script type="text/javascript" src="jquery.min.js"></script>
 <script type="text/javascript" src="mathquill.php"></script>
+<script type="text/javascript" src="AMtoMQlite.js"></script>
 <script type="text/javascript">
 var ed;
+var cured;
+var curee = -1;
+function initmathquillregions() {
+	ed = $('.mathquill-editable');
+	$('.mathquill-rendered-math').mathquill('redraw');
+  	ed.each(function(i,el) {
+  		$(el).find('textarea').bind('focus',function() {
+  			cured = $(this).parents('.mathquill-editable');
+  			var curid = cured.get(0).id;
+  			if (curee != curid) {
+  				curee = curid;
+  				showee(cured);
+  			} else {
+  				unhideee(0);
+  			}
+  		});
+  		//this is NOT working in IE properly yet
+  		$(el).find('textarea').bind('blur', function() {hideee();});
+  		
+  		
+  		//this part is only for display - in real use, would just grab the contents onsubmit
+  		$(el).bind('keydown keypress DOMSubtreeModified', function () {
+  			setTimeout(function() {
+  				var output = MQtoAM($(el).mathquill('latex'));
+  				$('#qn'+el.id.substr(2)).val(output);
+  			});
+  		});
+  	});
+  	ed.first().find('textarea').focus();
+}
 $(function() {
-  //ed = $('.mathquill-editable').focus();
-  ed = $('#mqentry').focus();
+  
   $(window).load(function() {
-    $('.mathquill-rendered-math').mathquill('redraw').focus();
+  	initmathquillregions();
+  	$('#ee td').bind('mouseover mouseup', function() {
+		if (!$(this).hasClass("eeactive")) {
+			$(this).addClass("eehighlight");	
+		}
+  	}).bind('mousedown', function () {
+  		$(this).addClass("eeclick");	
+  	}).bind('mouseout', function () {
+  		$(this).removeClass("eehighlight");
+  	}).bind('mouseup', function () {
+  		$(this).removeClass("eeclick");
+  	});
   });
   
   $(document).ready(function() { 
-  	$('.eebtn').mousedown(function(e) {e.stopPropogation();}).click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var t = $(this).attr("btntext");
+  	$('.eebtn').click(eeinsert);
+  }); 
+}); 
+
+
+function eeinsert() {
+	var t = $(this).attr("btntext");
         var type = $(this).attr("btntype");
         t = t.replace('\\\\','\\');
         if (type==0) {
-		setTimeout(function() {ed.mathquill('cmd', t).focus();});
+		cured.mathquill('cmd', t).find('textarea').focus();
 	} else if (type==1) {
-		setTimeout(function() {ed.mathquill('write', t).focus();});
+		cured.mathquill('write', t).find('textarea').focus();
 	} else if (type==2) {
-		setTimeout(function() {ed.mathquill('writesimpfunc', t).focus();});
+		cured.mathquill('writesimpfunc', t).find('textarea').focus();
 	} else if (type==3) {
-		setTimeout(function() {ed.mathquill('writefunc', t).focus();});
+		cured.mathquill('writefunc', t).find('textarea').focus();
 	} else if (type=4) {
-		setTimeout(function() {ed.mathquill('writeint', t).focus();});
+		cured.mathquill('writeint', t).find('textarea').focus();
 	}
-    }); 
-}); 
-});
-/*$('.eebtn').click(function(e) {
-  var latex = $(e.target).closest('p').children('code').text();
-  if(latex)
-    ed.mathquill('write', latex).focus();
-});*/
-/*
-function eeinsert(t,type) {
-	if (type==0) {
-		ed.mathquill('cmd', t).focus();
-	} else if (type==1) {
-		ed.mathquill('write', t).focus();
-	} else if (type==2) {
-		ed.mathquill('writesimpfunc', t).focus();
-	} else if (type==3) {
-		ed.mathquill('writefunc', t).focus();
-	} else if (type=4) {
-		ed.mathquill('writeint', t).focus();
-	}
-	setTimeout(function() {ed.focus();},50);
 }
-*/
+
+
+var eeclosetimer = null;
 
 
 function eetoggleactive(n) {
 	for (var i=1; i<=5; i++) {
 		if (n==i) {
+			$('#eetab'+i).addClass('eeactive').removeClass("eehighlight");
 			document.getElementById("ee"+i).style.display = "";
-			document.getElementById("eetab"+i).style.backgroundColor = "#cfc";
 		} else {
 			document.getElementById("ee"+i).style.display = "none";
-			document.getElementById("eetab"+i).style.backgroundColor = "#fff";
+			$('#eetab'+i).removeClass('eeactive');
 		}
 	}
 	eeactivetab = n;
-	setTimeout(function() {ed.focus();});
-	/*el = document.getElementById(eecurel);
-	if (el.setSelectionRange){
-		el.focus();
-	    }
-	    else if (document.selection && document.selection.createRange) {
-		eeselstore.select();
-	    }
-	unhideee(0);*/
+	cured.find('textarea').focus();
 }
 
 function showee(eln) {
-	el = document.getElementById(eln);
 	var ee = document.getElementById('ee');
-	eecurel = eln;
-	p = el.position()
-	ee.style.left = p.left + "px";
-	ee.style.top = (p.top + el.offsetHeight) + "px";
 	ee.style.display = "block";
-	el.focus();
+	p = eln.first().position();
+	ee.style.left = p.left + "px";
+	ee.style.top = (p.top - ee.offsetHeight - 4) + "px";
+	eln.find('textarea').focus();
+}
+function unhideee(t) {
+	eecancelclosetimer();
+}
+function hideee(t) {
+	eeclosetimer = window.setTimeout(reallyhideee,250);
+}
+function eecancelclosetimer() {
+	if (eeclosetimer) {
+		window.clearTimeout(eeclosetimer);
+		eeclosetimer = null;
+	}
+}
+function reallyhideee() {
+	document.getElementById('ee').style.display = "none";
+	curee = -1;
 }
 </script>
 
