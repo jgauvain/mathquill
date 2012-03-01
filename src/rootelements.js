@@ -278,6 +278,9 @@ _.keydown = function(e)
     break;
   case 13: //enter
   case 'Enter':
+  	  if (typeof savemathquill === 'function') {
+  	  	  savemathquill();
+  	  }
     break;
   case 35: //end
   case 'End':

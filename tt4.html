@@ -8,6 +8,49 @@
 <script type="text/javascript" src="mathquill/build/mathquill.js"></script-->
 <link rel="stylesheet" href="mathquill.css">
 <style type="text/css">
+#ee {
+	position: absolute;
+	width: auto;
+	background: #EEE;
+	border: 2px solid #009;
+	margin:0; padding: 0;
+	display: none;
+}
+#eetopbar {
+	background: #006;
+	width: 100%;
+	color: #fff;
+	cursor: pointer;
+	height: 26px;
+	line-height: 26px;
+}
+#eetopbar>span {
+	padding-left: 5px;
+}
+#eeclosebutton {
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	float: right;
+	text-align: center;
+	background: #fff;
+	color: #000;
+	margin: 2px;
+	border: 1px solid #009;
+}
+#eeclosebutton:hover {
+	color: #f00;
+}
+#eeinsides {
+	padding: 5px;
+}
+#mqholder {
+	margin: 10px 5px;
+}
+#mqarea {
+	min-width: 25em;
+	min-height: 2em;
+}
 .eebtn {
 	font-family: "Times New Roman", Times, serif;
 	color: #000;
@@ -38,6 +81,20 @@
 .eeclick {
 	background: #99f;
 }
+.eedd {
+	cursor: pointer;
+	font-family: sans-serif;
+	position: absolute; 
+	height: 8px; 
+	/*background: #ff0 url('tinyarrow.gif') no-repeat center;*/
+	display:none; 
+	text-align:center; 
+	color: #fa0;
+	font-size: 6px;
+	border: 1px solid #fa0;
+	border-left: 0;
+	width: 10px;
+}
 </style>
 
 </head>
@@ -47,15 +104,18 @@
 
 <p>This is a demo of a discoverable toolbar GUI for MathQuill commands and symbols. </p>
 
-<p>Input box 1: <span class="mathquill-editable" id="mq01" ></span> <input type="text" class="use-mathquill" id="qn01" />  </p>
+<p>Input box 1:  <input type="text" class="use-mathquill" id="qn01" onfocus="showeedd('qn01')" onblur="hideedd()" />  </p>
 
 <p>Some text</p>
 
-<p>Input box 2: <span class="mathquill-editable" id="mq02" >x^2</span> <input type="text" class="use-mathquill" id="qn02" value="x^2" />  </p>
+<p>Input box 2: <input type="text" class="use-mathquill" id="qn02" value="x^2" onfocus="showeedd('qn02')" onblur="hideedd()" />  </p>
 
 
-<div id="ee" style="position: absolute; width: auto; background: #ff0;padding: 5px;">
-<div id="eeadvanced">
+<div id="eedd" class="eedd" onclick="showee(cureedd);">&uarr;</div>
+<div id="ee">
+<div id="eetopbar"><span>MathQuill</span><div id="eeclosebutton" onclick="hideee()">X</div></div>
+<div id="eeinsides">
+<div id="eeeditorcont">
 <table>
 <tr>
 <td class="eetab eeactive" id="eetab1" onclick="eetoggleactive('1')">General</td>
@@ -120,6 +180,15 @@
 <td class="eebtn" btntext="\\langle" btntype="0">&lt;  &gt;</td>
 </tr>
 </table>
+
+<div id="mqholder"><span class="mathquill-editable" id="mqarea" ></span></div>
+</div>
+
+<input type="button" value="Save" onclick="savemathquill()" style="float: right;"/>
+<table>
+<tr><td></td><td class="eebtn" btntext="u" btntype="5">&uarr;</td><td></td></tr>
+<tr><td class="eebtn" btntext="l" btntype="5">&larr;</td><td></td><td class="eebtn" btntext="r" btntype="5">&rarr;</td></tr>
+<tr><td></td><td class="eebtn" btntext="d" btntype="5">&darr;</td><td></td></tr>
 </div>
 </div>
 
@@ -128,41 +197,17 @@
 <script type="text/javascript" src="AMtoMQlite.js"></script>
 <script type="text/javascript">
 var ed;
-var cured;
-var curee = -1;
 function initmathquillregions() {
 	ed = $('.mathquill-editable');
 	$('.mathquill-rendered-math').mathquill('redraw');
-  	ed.each(function(i,el) {
-  		$(el).find('textarea').bind('focus',function() {
-  			cured = $(this).parents('.mathquill-editable');
-  			var curid = cured.get(0).id;
-  			if (curee != curid) {
-  				curee = curid;
-  				showee(cured);
-  			} else {
-  				unhideee(0);
-  			}
-  		});
-  		//this is NOT working in IE properly yet
-  		$(el).find('textarea').bind('blur', function() {hideee();});
-  		
-  		
-  		//this part is only for display - in real use, would just grab the contents onsubmit
-  		$(el).bind('keydown keypress DOMSubtreeModified', function () {
-  			setTimeout(function() {
-  				var output = MQtoAM($(el).mathquill('latex'));
-  				$('#qn'+el.id.substr(2)).val(output);
-  			});
-  		});
-  	});
-  	ed.first().find('textarea').focus();
+  	ed.find('textarea').focus();
 }
+var mousebase;
 $(function() {
   
   $(window).load(function() {
   	initmathquillregions();
-  	$('#ee td').bind('mouseover mouseup', function() {
+  	$('#ee td.eebtn').bind('mouseover mouseup', function() {
 		if (!$(this).hasClass("eeactive")) {
 			$(this).addClass("eehighlight");	
 		}
@@ -173,6 +218,17 @@ $(function() {
   	}).bind('mouseup', function () {
   		$(this).removeClass("eeclick");
   	});
+  	
+  	$('#eetopbar').mousedown(function(evt) {
+  		mousebase = {left:evt.pageX, top: evt.pageY};
+  		$("body").bind('mousemove',eemousemove);
+  		$("body").mouseup(function(event) {
+  			lasteepos = $('#ee').offset();
+  			console.log(lasteepos);
+  			$("body").unbind('mousemove',eemousemove);
+  			$(this).unbind(event);
+  		});
+  	})
   });
   
   $(document).ready(function() { 
@@ -180,91 +236,53 @@ $(function() {
   }); 
 }); 
 
+function eemousemove(evt) {
+	$('#ee').css('left', (evt.pageX - mousebase.left) + lasteepos.left)
+	  .css('top', (evt.pageY - mousebase.top) + lasteepos.top);
+	return false;
+}
 
 function eeinsert() {
 	var t = $(this).attr("btntext");
         var type = $(this).attr("btntype");
         t = t.replace('\\\\','\\');
         if (type==0) {
-		cured.mathquill('cmd', t).find('textarea').focus();
+		ed.mathquill('cmd', t).find('textarea').focus();
 	} else if (type==1) {
-		cured.mathquill('write', t).find('textarea').focus();
+		ed.mathquill('write', t).find('textarea').focus();
 	} else if (type==2) {
-		cured.mathquill('writesimpfunc', t).find('textarea').focus();
+		ed.mathquill('writesimpfunc', t).find('textarea').focus();
 	} else if (type==3) {
-		cured.mathquill('writefunc', t).find('textarea').focus();
+		ed.mathquill('writefunc', t).find('textarea').focus();
 	} else if (type==4) {
-		cured.mathquill('writeint', t).find('textarea').focus();
+		ed.mathquill('writeint', t).find('textarea').focus();
+	} else if (type==5) {
+		ed.mathquill('movecursor', t).find('textarea').focus();
 	}
 }
 
-//Accordian code from http://www.stemkoski.com/stupid-simple-jquery-accordion-menu/
-/***********************************************************************************************************************
-DOCUMENT: includes/javascript.js
-DEVELOPED BY: Ryan Stemkoski
-COMPANY: Zipline Interactive
-EMAIL: ryan@gozipline.com
-PHONE: 509-321-2849
-DATE: 3/26/2009
-UPDATED: 3/25/2010
-DESCRIPTION: This is the JavaScript required to create the accordion style menu.  Requires jQuery library
-NOTE: Because of a bug in jQuery with IE8 we had to add an IE stylesheet hack to get the system to work in all browsers. I hate hacks but had no choice :(.
-************************************************************************************************************************/
-$(document).ready(function() {
-	 
-	//ACCORDION BUTTON ACTION (ON CLICK DO THE FOLLOWING)
-	$('.accordionButton').click(function() {
 
-		//REMOVE THE ON CLASS FROM ALL BUTTONS
-		//$('.accordionButton').removeClass('on');
-		  
-		//NO MATTER WHAT WE CLOSE ALL OPEN SLIDES
-	 	$('.accordionContent').slideUp('normal');
-   
-		//IF THE NEXT SLIDE WASN'T OPEN THEN OPEN IT
-		if($(this).next().is(':hidden') == true) {
-			
-			//ADD THE ON CLASS TO THE BUTTON
-			//$(this).addClass('on');
-			  
-			//OPEN THE SLIDE
-			$(this).next().slideDown('normal');
-		 } 
-		  
-	 });
-	  
+
+var eeddclosetimer = null;
+var cureedd = null;
+var lasteepos = null;
+function showeedd(eln) {
+	if (eeddclosetimer) {
+		window.clearTimeout(eeddclosetimer);
+		eeddclosetimer = null;
+	}
+	hideee();
+	cureedd = eln;
+	var dd = $("#eedd");
+	var el = $("#"+eln);
 	
-	/*** REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
-	
-	//ADDS THE .OVER CLASS FROM THE STYLESHEET ON MOUSEOVER 
-	$('.accordionButton').mouseover(function() {
-		$(this).addClass('over');
-		
-	//ON MOUSEOUT REMOVE THE OVER CLASS
-	}).mouseout(function() {
-		$(this).removeClass('over');										
-	});
-	
-	/*** END REMOVE IF MOUSEOVER IS NOT REQUIRED ***/
-	
-	
-	/********************************************************************************************************************
-	CLOSES ALL S ON PAGE LOAD
-	********************************************************************************************************************/	
-	$('.accordionContent').hide();
-
-});
-
-
-
-
-
-
-//end accordian code
-
-
-var eeclosetimer = null;
-
+	var p = el.offset();
+	p.left += el.outerWidth();
+	dd.css('left',p.left+"px").css('top',p.top+"px").height(el.outerHeight()-2).show();
+}
+function hideedd() {
+	eeddclosetimer = setTimeout(function() {$("#eedd").hide();}, 250);
+}
 
 function eetoggleactive(n) {
 	for (var i=1; i<=5; i++) {
@@ -277,33 +295,30 @@ function eetoggleactive(n) {
 		}
 	}
 	eeactivetab = n;
-	cured.find('textarea').focus();
+	ed.find('textarea').focus();
 }
 
 function showee(eln) {
-	var ee = document.getElementById('ee');
-	ee.style.display = "block";
-	p = eln.first().position();
-	ee.style.left = p.left + "px";
-	ee.style.top = (p.top - ee.offsetHeight - 4) + "px";
-	eln.find('textarea').focus();
-}
-function unhideee(t) {
-	eecancelclosetimer();
-}
-function hideee(t) {
-	eeclosetimer = window.setTimeout(reallyhideee,250);
-}
-function eecancelclosetimer() {
-	if (eeclosetimer) {
-		window.clearTimeout(eeclosetimer);
-		eeclosetimer = null;
+	var ee = $("#ee");
+	if (!lasteepos) {
+		lasteepos = {
+			left: ($(window).width() - ee.outerWidth())/2,
+			top: ($(window).height() - ee.outerHeight())/2 
+		};
 	}
+	ee.css('left',lasteepos.left).css('top',lasteepos.top).show();
+	ed.mathquill('latex', AMtoMQ($("#"+cureedd).val()));
+	ed.find('textarea').focus();
+	
 }
-function reallyhideee() {
-	document.getElementById('ee').style.display = "none";
-	curee = -1;
+function hideee() {
+	$("#ee").hide();
 }
+function savemathquill() {
+	$("#"+cureedd).val(MQtoAM(ed.mathquill('latex')));
+	hideee();	
+}
+
 </script>
 
 </body>

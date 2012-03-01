@@ -9,41 +9,114 @@
 <link rel="stylesheet" href="mathquill.css">
 <style type="text/css">
 .eebtn {
+	display: inline-block;
 	font-family: "Times New Roman", Times, serif;
+	font-size: 12px;
 	color: #000;
 	cursor: pointer;
-	padding: 0px .5em;
-	height: 35px;
+	width:30px;
+	height:30px;
 	border: 1px solid #000;
 	text-align: center;
 	background: #fff;
 	vertical-align: middle;
+	margin: 0 1px 1px 0;
 }
-.eetab { 
-	cursor: pointer;
-	height: 35px;
-	padding: 0px 1em;
-	border: 1px solid #000;
-	text-align: center;
-	background: #fff;
-	vertical-align: middle;
-	color: #000;
-}
-.eeactive {
-	background: #cfc;
-}
+
 .eehighlight {
 	background: #ccf;
 }
-.eeclick {
-	background: #99f;
+
+
+#mqtools {
+	width:0px;
+	overflow: hidden;
+	position: fixed;
+	right: 0px;
 }
+.accordionButton {	
+	width: 100px;
+	padding: 4px 0px;
+	/*float: left;
+	_float: none;  /* Float works in all browsers but IE6 */
+	background: #003366;
+	color: #ffffff;
+	text-align: center;
+	border-bottom: 1px solid #FFFFFF;
+	cursor: pointer;
+	}
+	
+.accordionContent {	
+	width: 100px;
+	padding: 2px;
+	/*float: left;
+	_float: none; /* Float works in all browsers but IE6 */
+	background: #95B1CE;
+	font-size: 0;
+	}
+
+.over {
+	color: #9999ff;
+	}
 </style>
 
 </head>
 <body>
 
 <h1>MathQuill Toolbar Demo</h1>
+
+<div id="mqtools">
+	<div class="accordionButton">Basic</div>
+	<div class="accordionContent">
+		<div class="eebtn" btntext="\\frac" btntype="0"><sup>x</sup>/<sub>y</sub></div>
+		<div class="eebtn" btntext="^" btntype="0">x<sup>y</sup></div>
+		<div class="eebtn" btntext="\\sqrt" btntype="0">&radic;</div>
+		<div class="eebtn" btntext="(" btntype="0">( )</div>
+		<div class="eebtn" btntext="\\pi" btntype="1">&pi;</div>
+		<div class="eebtn" btntext="\\infty" btntype="1">&infin;</div>
+		<div class="eebtn" btntext="DNE" btntype="1">DNE</div>
+	</div>
+	<div class="accordionButton">Intervals</div>
+	<div class="accordionContent">
+		<div class="eebtn" btntext="(" btntype="4">(  )</div>
+		<div class="eebtn" btntext="\\intervalopenleft" btntype="4">(  ]</div>
+		<div class="eebtn" btntext="\\intervalopenright" btntype="4">[ )</div> 
+		<div class="eebtn" btntext="[" btntype="4">[   ]</div>
+		<div class="eebtn" btntext="-\\infty" btntype="1">-&infin;</div>
+		<div class="eebtn" btntext="\\infty" btntype="1">&infin;</div>
+		<div class="eebtn" btntext="DNE" btntype="1">DNE</div>
+	</div>
+	<div class="accordionButton">Inequalities</div>
+	<div class="accordionContent">
+		<div class="eebtn" btntext="<" btntype="1">&lt;</div>
+		<div class="eebtn" btntext=">" btntype="1">&gt;</div>
+		<div class="eebtn" btntext="\\le" btntype="1">&le;</div>
+		<div class="eebtn" btntext="\\ge" btntype="1">&ge;</div>
+		<div class="eebtn" btntext="\\text{ or }" btntype="1">or</div>
+		<div class="eebtn" btntext="\\text{all real numbers}" btntype="1">All Reals</div>
+		<div class="eebtn" btntext="DNE" btntype="1">DNE</div>
+	</div>
+	<div class="accordionButton">Functions</div>
+	<div class="accordionContent">
+		<div class="eebtn" btntext="\\nthroot{3}" btntype="2"><sup>3</sup>&radic;</div>
+		<div class="eebtn" btntext="\\log" btntype="3">log</div>
+		<div class="eebtn" btntext="\\log_2" btntype="3">log<sub><sub>2</sub></sub></div>
+		<div class="eebtn" btntext="\\ln" btntype="3">ln</div>
+		<div class="eebtn" btntext="|" btntype="0">| x |</div>
+		<div class="eebtn" btntext="e^" btntype="2">e<sup>x</sup></div>
+	</div>
+	<div class="accordionButton">Trig</div>
+	<div class="accordionContent">
+		<div class="eebtn" btntext="\\sin" btntype="3">sin</div>
+		<div class="eebtn" btntext="\\cos" btntype="3">cos</div>
+		<div class="eebtn" btntext="\\tan" btntype="3">tan</div>
+		<div class="eebtn" btntext="\\sin^2" btntype="3">sin<sup>2</sup></div>
+		<div class="eebtn" btntext="\\arcsin" btntype="3">sin<sup>-1</sup></div>
+		<div class="eebtn" btntext="\\arccos" btntype="3">cos<sup>-1</sup></div>
+		<div class="eebtn" btntext="\\arctan" btntype="3">tan<sup>-1</sup></div>
+		<div class="eebtn" btntext="\\langle" btntype="0">&lt;  &gt;</div>
+	</div>
+</div>
 
 <p>This is a demo of a discoverable toolbar GUI for MathQuill commands and symbols. </p>
 
@@ -53,75 +126,6 @@
 
 <p>Input box 2: <span class="mathquill-editable" id="mq02" >x^2</span> <input type="text" class="use-mathquill" id="qn02" value="x^2" />  </p>
 
-
-<div id="ee" style="position: absolute; width: auto; background: #ff0;padding: 5px;">
-<div id="eeadvanced">
-<table>
-<tr>
-<td class="eetab eeactive" id="eetab1" onclick="eetoggleactive('1')">General</td>
-<td class="eetab" id="eetab4" onclick="eetoggleactive('4')">Intervals</td>
-<td class="eetab" id="eetab5" onclick="eetoggleactive('5')">Inequalities</td>
-<td class="eetab" id="eetab2" onclick="eetoggleactive('2')">Functions</td>
-<td class="eetab" id="eetab3" onclick="eetoggleactive('3')">Trig</td>
-</tr>
-</table>
-<table id="ee1">
-<tr>
-<td class="eebtn" btntext="\\frac" btntype="0"><sup>x</sup>/<sub>y</sub></td>
-<td class="eebtn" btntext="^" btntype="0">x<sup>y</sup></td>
-<td class="eebtn" btntext="\\sqrt" btntype="0">&radic;</td>
-<td class="eebtn" btntext="\\nthroot{3}" btntype="2"><sup>3</sup>&radic;</td>
-<td class="eebtn" btntext="(" btntype="0">( )</td>
-<td class="eebtn" btntext="\\pi" btntype="1">&pi;</td>
-<td class="eebtn" btntext="\\infty" btntype="1">&infin;</td>
-<td class="eebtn" btntext="DNE" btntype="1">DNE</td>
-</tr>
-</table>
-<table id="ee4" style="display:none;">
-<tr>
-<td class="eebtn" btntext="(" btntype="4">(  )</td>
-<td class="eebtn" btntext="\\intervalopenleft" btntype="4">(  ]</td>
-<td class="eebtn" btntext="\\intervalopenright" btntype="4">[ )</td> 
-<td class="eebtn" btntext="[" btntype="4">[   ]</td>
-<td class="eebtn" btntext="-\\infty" btntype="1">-&infin;</td>
-<td class="eebtn" btntext="\\infty" btntype="1">&infin;</td>
-<td class="eebtn" btntext="DNE" btntype="1">DNE</td>
-</tr>
-</table>
-<table id="ee5" style="display:none;">
-<tr>
-<td class="eebtn" btntext="<" btntype="1">&lt;</td>
-<td class="eebtn" btntext=">" btntype="1">&gt;</td>
-<td class="eebtn" btntext="\\le" btntype="1">&le;</td>
-<td class="eebtn" btntext="\\ge" btntype="1">&ge;</td>
-<td class="eebtn" btntext="\\text{ or }" btntype="1">or</td>
-<td class="eebtn" btntext="\\text{all real numbers}" btntype="1">All Real Numbers</td>
-<td class="eebtn" btntext="DNE" btntype="1">DNE</td>
-</tr>
-</table>
-<table id="ee2" style="display:none;">
-<tr>
-<td class="eebtn" btntext="\\log" btntype="3">log</td>
-<td class="eebtn" btntext="\\log_2" btntype="3">log<sub><sub>2</sub></sub></td>
-<td class="eebtn" btntext="\\ln" btntype="3">ln</td>
-<td class="eebtn" btntext="|" btntype="0">| x |</td>
-<td class="eebtn" btntext="e^" btntype="2">e<sup>x</sup></td>
-</tr>
-</table>
-<table id="ee3" style="display:none;">
-<tr>
-<td class="eebtn" btntext="\\sin" btntype="3">sin</td>
-<td class="eebtn" btntext="\\cos" btntype="3">cos</td>
-<td class="eebtn" btntext="\\tan" btntype="3">tan</td>
-<td class="eebtn" btntext="\\sin^2" btntype="3">sin<sup>2</sup></td>
-<td class="eebtn" btntext="\\arcsin" btntype="3">sin<sup>-1</sup></td>
-<td class="eebtn" btntext="\\arccos" btntype="3">cos<sup>-1</sup></td>
-<td class="eebtn" btntext="\\arctan" btntype="3">tan<sup>-1</sup></td>
-<td class="eebtn" btntext="\\langle" btntype="0">&lt;  &gt;</td>
-</tr>
-</table>
-</div>
-</div>
 
 <script type="text/javascript" src="jquery.min.js"></script>
 <script type="text/javascript" src="mathquill.php"></script>
@@ -144,7 +148,6 @@ function initmathquillregions() {
   				unhideee(0);
   			}
   		});
-  		//this is NOT working in IE properly yet
   		$(el).find('textarea').bind('blur', function() {hideee();});
   		
   		
@@ -162,22 +165,15 @@ $(function() {
   
   $(window).load(function() {
   	initmathquillregions();
-  	$('#ee td').bind('mouseover mouseup', function() {
-		if (!$(this).hasClass("eeactive")) {
-			$(this).addClass("eehighlight");	
-		}
-  	}).bind('mousedown', function () {
-  		$(this).addClass("eeclick");	
-  	}).bind('mouseout', function () {
-  		$(this).removeClass("eehighlight");
-  	}).bind('mouseup', function () {
-  		$(this).removeClass("eeclick");
-  	});
   });
   
   $(document).ready(function() { 
   	$('.eebtn').click(eeinsert);
-  }); 
+  }).bind('mouseover', function() {
+  	  $(this).addClass("eehighlight");
+  }).bind('mouseout', function() {
+  	  $(this).removeClass("eehighlight");
+  });
 }); 
 
 
@@ -196,6 +192,31 @@ function eeinsert() {
 	} else if (type==4) {
 		cured.mathquill('writeint', t).find('textarea').focus();
 	}
+}
+
+var eeclosetimer = null;
+
+
+function showee(eln) {
+	$('#mqtools').animate({width: 100});
+	eln.find('textarea').focus();
+}
+function unhideee(t) {
+	eecancelclosetimer();
+}
+function hideee(t) {
+	eeclosetimer = window.setTimeout(reallyhideee,250);
+}
+function eecancelclosetimer() {
+	if (eeclosetimer) {
+		window.clearTimeout(eeclosetimer);
+		eeclosetimer = null;
+	}
+}
+function reallyhideee() {
+	//document.getElementById('ee').style.display = "none";
+	$('#mqtools').animate({width: 0});
+	curee = -1;
 }
 
 //Accordian code from http://www.stemkoski.com/stupid-simple-jquery-accordion-menu/
@@ -230,7 +251,7 @@ $(document).ready(function() {
 			//OPEN THE SLIDE
 			$(this).next().slideDown('normal');
 		 } 
-		  
+		 cured.find('textarea').focus(); 
 	 });
 	  
 	
@@ -252,58 +273,11 @@ $(document).ready(function() {
 	CLOSES ALL S ON PAGE LOAD
 	********************************************************************************************************************/	
 	$('.accordionContent').hide();
+	$('.accordionContent:first').show();
 
 });
 
-
-
-
-
-
 //end accordian code
-
-
-var eeclosetimer = null;
-
-
-function eetoggleactive(n) {
-	for (var i=1; i<=5; i++) {
-		if (n==i) {
-			$('#eetab'+i).addClass('eeactive').removeClass("eehighlight");
-			document.getElementById("ee"+i).style.display = "";
-		} else {
-			document.getElementById("ee"+i).style.display = "none";
-			$('#eetab'+i).removeClass('eeactive');
-		}
-	}
-	eeactivetab = n;
-	cured.find('textarea').focus();
-}
-
-function showee(eln) {
-	var ee = document.getElementById('ee');
-	ee.style.display = "block";
-	p = eln.first().position();
-	ee.style.left = p.left + "px";
-	ee.style.top = (p.top - ee.offsetHeight - 4) + "px";
-	eln.find('textarea').focus();
-}
-function unhideee(t) {
-	eecancelclosetimer();
-}
-function hideee(t) {
-	eeclosetimer = window.setTimeout(reallyhideee,250);
-}
-function eecancelclosetimer() {
-	if (eeclosetimer) {
-		window.clearTimeout(eeclosetimer);
-		eeclosetimer = null;
-	}
-}
-function reallyhideee() {
-	document.getElementById('ee').style.display = "none";
-	curee = -1;
-}
 </script>
 
 </body>

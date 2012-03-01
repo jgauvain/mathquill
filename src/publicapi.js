@@ -5,6 +5,7 @@
 //The publicy exposed method of jQuery.prototype, available (and meant to be
 //called) on jQuery-wrapped HTML DOM elements.
 $.fn.mathquill = function(cmd, latex) {
+	console.log(cmd);
   switch (cmd) {
   case 'redraw':
     this.find(':not(:has(:first))').each(function() {
@@ -63,6 +64,33 @@ $.fn.mathquill = function(cmd, latex) {
           	  cursor.moveLeft();
           }
       });
+   case 'movecursor':
+      if (arguments.length > 1)
+      return this.each(function() {
+          var data = $(this).data(jQueryDataKey),
+          block = data && data.block,
+          cursor = block && block.cursor;
+console.log('in movecursor');
+          if (cursor) {
+          	  if (latex=='l') { cursor.moveLeft();}
+          	  else if (latex=='r') {cursor.moveRight();}
+          	  else if (latex=='u') {
+          	    if (cursor.parent.prev)
+		      cursor.clearSelection().appendTo(cursor.parent.prev);
+		    else if (cursor.prev)
+		      cursor.clearSelection().prependTo(cursor.parent);
+		    else 
+		      cursor.moveLeft(); 
+          	  } else if (latex=='d') {
+          	    if (cursor.parent.next)
+		      cursor.clearSelection().prependTo(cursor.parent.next);
+		    else if (cursor.next)
+		      cursor.clearSelection().appendTo(cursor.parent);
+		    else
+		      cursor.moveRight();
+		  }
+          }
+      });	      
    case 'writesimpfunc':
       if (arguments.length > 1)
       return this.each(function() {
