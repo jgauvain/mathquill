@@ -5,7 +5,6 @@
 //The publicy exposed method of jQuery.prototype, available (and meant to be
 //called) on jQuery-wrapped HTML DOM elements.
 $.fn.mathquill = function(cmd, latex) {
-	console.log(cmd);
   switch (cmd) {
   case 'redraw':
     this.find(':not(:has(:first))').each(function() {
@@ -70,7 +69,7 @@ $.fn.mathquill = function(cmd, latex) {
           var data = $(this).data(jQueryDataKey),
           block = data && data.block,
           cursor = block && block.cursor;
-console.log('in movecursor');
+
           if (cursor) {
           	  if (latex=='l') { cursor.moveLeft();}
           	  else if (latex=='r') {cursor.moveRight();}
