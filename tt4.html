@@ -25,15 +25,15 @@
 
 <p>This is a demo of a discoverable toolbar GUI for MathQuill commands and symbols. </p>
 
-<p>Input box 1:  <input type="text" class="use-mathquill" id="qn01" onfocus="showeedd('qn01',0,null)" onblur="hideedd()" />  </p>
+<p>Input box 1:  <input type="text" class="use-mathquill" id="qn01" onfocus="showeedd('qn01',3,null)" onblur="hideeedd()" />  </p>
 
 <p>Some text</p>
 
-<p>Input box 2: <input type="text" class="use-mathquill" id="qn02" value="x^2" onfocus="showeedd('qn02',1,null)" onblur="hideedd()" />  </p>
+<p>Input box 2: <input type="text" class="use-mathquill" id="qn02" value="x^2" onfocus="showeedd('qn02',4,'int')" onblur="hideeedd()" />  </p>
 
 <p>Some text</p>
 
-<p>Input box 3: <input type="text" class="use-mathquill" id="qn03" value="x^2" onfocus="showeedd('qn03',1,'ineq')" onblur="hideedd()" />  </p>
+<p>Input box 3: <input type="text" class="use-mathquill" id="qn03" value="x^2" onfocus="showeedd('qn03',4,'ineq')" onblur="hideeedd()" />  </p>
 
 <div id="mqeedd" class="mqeedd" onclick="showee();">&uarr;</div>
 <div id="mqee">
@@ -90,6 +90,7 @@
 <td class="mqeebtn" btntext="[" btntype="4">[   ]</td>
 <td class="mqeebtn" btntext="-\\infty" btntype="1">-&infin;</td>
 <td class="mqeebtn" btntext="\\infty" btntype="1">&infin;</td>
+<td class="mqeebtn" btntext="\\cup" btntype="1">&cup;</td>
 <td class="mqeebtn" btntext="DNE" btntype="1">DNE</td>
 </tr>
 </table>
