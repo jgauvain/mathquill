@@ -25,21 +25,23 @@ _.insertAt = function(c) {
 		  lookback = d.cmd + lookback;
 		  d = d.prev;
 	  }
-	  if (lookback.match(/(sqrt|root|sin|cos|tan|sec|csc|cot|log|ln)/)) {
-	  	  for (var i=0;i<lookback.length-1;i++) {
+	  var m;
+	  if (m = lookback.match(/(sqrt|root|arcsin|arccos|arctan|sin|cos|tan|sec|csc|cot|log|ln)/)) {
+	  	  
+	  	  for (var i=0;i<m[0].length-1;i++) {
 	  	  	  c.selectLeft();
 	  	  }
-	  	  if (lookback=='root') {
-	  	  	  lookback = 'nthroot{3}';
+	  	  if (m[0]=='root') {
+	  	  	  m[0] = 'nthroot{3}';
 	  	  }
-	  	  c.writeLatex('\\'+lookback);
-	  	  if (lookback.match(/(sqrt|root)/)) {
+	  	  c.writeLatex('\\'+m[0]);
+	  	  if (m[0].match(/(sqrt|root)/)) {
 	  	  	  c.moveLeft();
 	  	  }
-	  } else if (lookback.match(/^(pi|oo)$/)) {
-		  if (lookback=='oo') { lookback = 'infty';}
+	  } else if (m = lookback.match(/(pi|oo)$/)) {
+		  if (m[0]=='oo') { m[0] = 'infty';}
 		  c.selectLeft();
-		  c.writeLatex('\\'+lookback);
+		  c.writeLatex('\\'+m[0]);
 	  } else {
 	  	  MathCommand.prototype.insertAt.apply(this,arguments);
 	  }

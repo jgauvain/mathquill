@@ -189,6 +189,23 @@ _.html_template = [
   '<span class="denominator"></span>'
 ];
 _.text_template = ['(', '/', ')'];
+_.redraw = function() {
+	  // Fixes display in IE7 - where each numerator/denominator pair aren't set to equal widths
+	 if ($.browser.msie  && parseInt($.browser.version, 10) <= 7) {
+		var $self = this.jQ,
+		$num = $self.children('.numerator'),
+		$denom = $self.children('.denominator'),
+		maxWidth;
+		    // Remove any forced width styles, so we can measure natural width of elements
+		$num.css('width', 'auto');
+		$denom.css('width', 'auto');
+		    // Find width that can fit both elements
+		maxWidth = Math.max($num.width(), $denom.width());
+		    // Apply this width to both elements
+		$num.css('width', maxWidth+'px');
+		$denom.css('width', maxWidth+'px');
+	 }
+};
 
 LatexCmds.frac = LatexCmds.dfrac = LatexCmds.cfrac = LatexCmds.fraction = Fraction;
 
