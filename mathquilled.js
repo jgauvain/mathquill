@@ -4,7 +4,7 @@ var mqmousebase;
 $(function() {
   
   $(window).load(function() {
-  		  hasTouch = 'ontouchstart' in document.documentElement;
+        hasTouch = 'ontouchstart' in document.documentElement;
   	mqarea = $('.mathquill-editable');
 	$('.mathquill-rendered-math').mathquill('redraw');
   	mqarea.find('textarea').focus();
